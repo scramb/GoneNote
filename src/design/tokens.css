@@ -1,0 +1,4 @@
+/* GoneNote Design Tokens */
+/* Non-color tokens are defined as :root variables in src/app.css. */
+/* Colors are defined as @theme tokens in src/app.css and used via Tailwind utilities (bg-surface, text-primary, etc.). */
+/* This file exists as a reference; all tokens are applied through Tailwind. */

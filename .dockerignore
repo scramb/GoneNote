@@ -1,0 +1,16 @@
+node_modules/
+.svelte-kit/
+.vite/
+.env
+*.log
+.DS_Store
+Thumbs.db
+tests/
+specs/
+.claude/
+.specify/
+.git/
+.gitignore
+.dockerignore
+docker-compose.yml
+README.md

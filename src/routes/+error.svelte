@@ -1,30 +1,31 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import Container from '$components/Container.svelte';
+  import StatusAlert from '$components/StatusAlert.svelte';
 </script>
 
 <svelte:head>
-  <title>Error — Bauhaus Note</title>
+  <title>Error — GoneNote</title>
 </svelte:head>
 
-<main>
-  <h1>{$page.status === 404 ? 'Note not found.' : 'Something went wrong.'}</h1>
-  {#if $page.status === 404}
-    <p>The note you're looking for doesn't exist or has already been read.</p>
-  {:else}
-    <p>Unable to process your request. Please try again later.</p>
-  {/if}
-  <a href="/">Create a note</a>
+<main class="min-h-screen flex items-center justify-center px-4">
+  <Container maxWidth="sm">
+    {#if $page.status === 404}
+      <StatusAlert
+        type="info"
+        title="Note not found"
+        message="The note you're looking for doesn't exist or has already been read."
+        actionLabel="Create a note"
+        actionHref="/"
+      />
+    {:else}
+      <StatusAlert
+        type="error"
+        title="Something went wrong"
+        message="Unable to process your request. Please try again later."
+        actionLabel="Go home"
+        actionHref="/"
+      />
+    {/if}
+  </Container>
 </main>
-
-<style>
-  main {
-    max-width: 640px;
-    margin: 2rem auto;
-    padding: 1rem;
-    font-family: system-ui, sans-serif;
-    text-align: center;
-  }
-  a {
-    color: #222;
-  }
-</style>

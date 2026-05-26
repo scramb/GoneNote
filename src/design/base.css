@@ -1,0 +1,41 @@
+/* Global resets and base styles */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Glassmorphism utility */
+.glass-surface {
+  background: var(--color-glass);
+  backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-surface {
+    background: var(--color-elevated);
+  }
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

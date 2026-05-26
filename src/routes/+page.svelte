@@ -1,11 +1,16 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import type { ActionData } from './$types';
+  import Container from '$components/Container.svelte';
+  import Textarea from '$components/Textarea.svelte';
+  import RadioGroup from '$components/RadioGroup.svelte';
+  import Button from '$components/Button.svelte';
+  import ShieldIcon from '$components/icons/ShieldIcon.svelte';
+  import LinkDisplay from '$components/LinkDisplay.svelte';
 
-  export let form: ActionData;
+  let { form } = $props<{ form: ActionData }>();
   let content = $state('');
   let ttl = $state('604800');
-  let copied = $state(false);
 
   const maxLength = 102400;
   const ttls = [
@@ -14,143 +19,56 @@
     { value: '604800', label: '7 days' },
     { value: '2592000', label: '30 days' },
   ];
-
-  function copyLink() {
-    if (!form?.noteUrl) return;
-    const url = new URL(form.noteUrl, window.location.origin).href;
-    navigator.clipboard.writeText(url).then(() => {
-      copied = true;
-      setTimeout(() => (copied = false), 2000);
-    });
-  }
 </script>
 
 <svelte:head>
-  <title>Bauhaus Note — Create a self-destructing note</title>
+  <title>GoneNote — Self-destructing notes</title>
 </svelte:head>
 
-<main>
-  <h1>Bauhaus Note</h1>
-  <p>Create a note that self-destructs after it's read.</p>
-
-  {#if form?.success && form.noteUrl}
-    <section class="result">
-      <h2>Note created</h2>
-      <p>Share this link — it will work exactly once.</p>
-      <div class="link-box">
-        <input type="text" value={new URL(form.noteUrl, typeof window !== 'undefined' ? window.location.origin : '').href} readonly />
-        <button onclick={copyLink}>
-          {copied ? 'Copied!' : 'Copy'}
-        </button>
+<main class="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+  <Container maxWidth="md">
+    <!-- Hero -->
+    <div class="mb-10 animate-[fadeIn_400ms_ease-[--ease-entrance]_both]">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <ShieldIcon class="w-8 h-8 text-accent" />
+        <h1 class="text-3xl font-semibold tracking-tight text-primary m-0">
+          GoneNote
+        </h1>
       </div>
-    </section>
-  {:else}
-    <form method="POST" use:enhance>
-      <label for="content">Note content</label>
-      <textarea
-        id="content"
-        name="content"
-        bind:value={content}
-        maxlength={maxLength}
-        rows={8}
-        placeholder="Type your note here..."
-        required
-      ></textarea>
-      <p class="char-count">{content.length} / {maxLength}</p>
+      <p class="text-lg text-secondary m-0 max-w-md mx-auto">
+        Create a note that disappears forever after it's read.
+      </p>
+    </div>
 
-      <fieldset>
-        <legend>Expires after</legend>
-        {#each ttls as opt}
-          <label class="ttl-option">
-            <input type="radio" name="ttl" value={opt.value} bind:group={ttl} />
-            {opt.label}
-          </label>
-        {/each}
-      </fieldset>
+    {#if form?.success && form.noteUrl}
+      <LinkDisplay url={form.noteUrl} />
+    {:else}
+      <!-- Form -->
+      <form method="POST" use:enhance class="w-full animate-[fadeIn_400ms_ease-[--ease-entrance]_400ms_both]">
+        <Textarea
+          name="content"
+          bind:value={content}
+          maxlength={maxLength}
+          placeholder="Type your note here..."
+          required={true}
+          error={form?.error}
+        />
 
-      {#if form?.error}
-        <p class="error">{form.error}</p>
-      {/if}
+        <div class="mt-5">
+          <p class="text-xs text-muted uppercase tracking-wider mb-2">Expires after</p>
+          <RadioGroup
+            name="ttl"
+            bind:value={ttl}
+            options={ttls}
+          />
+        </div>
 
-      <button type="submit">Create Note</button>
-    </form>
-  {/if}
+        <div class="mt-6">
+          <Button type="submit" variant="primary" size="md" class="w-full">
+            Create Note
+          </Button>
+        </div>
+      </form>
+    {/if}
+  </Container>
 </main>
-
-<style>
-  main {
-    max-width: 640px;
-    margin: 2rem auto;
-    padding: 1rem;
-    font-family: system-ui, sans-serif;
-  }
-  h1 {
-    margin: 0 0 0.5rem;
-  }
-  textarea {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.75rem;
-    font: inherit;
-    resize: vertical;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  .char-count {
-    text-align: right;
-    color: #666;
-    font-size: 0.85rem;
-    margin: 0.25rem 0 1rem;
-  }
-  fieldset {
-    border: none;
-    padding: 0;
-    margin: 0 0 1rem;
-  }
-  legend {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
-  .ttl-option {
-    display: inline-block;
-    margin-right: 1rem;
-    cursor: pointer;
-  }
-  .ttl-option input {
-    margin-right: 0.25rem;
-  }
-  .error {
-    color: #c00;
-    font-size: 0.9rem;
-    margin: 0.5rem 0;
-  }
-  button {
-    padding: 0.75rem 1.5rem;
-    font: inherit;
-    cursor: pointer;
-    background: #222;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-  }
-  button:hover {
-    background: #444;
-  }
-  .result {
-    background: #f0f8f0;
-    border: 1px solid #8c8;
-    border-radius: 4px;
-    padding: 1rem;
-  }
-  .link-box {
-    display: flex;
-    gap: 0.5rem;
-  }
-  .link-box input {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font: inherit;
-  }
-</style>
