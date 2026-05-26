@@ -46,7 +46,7 @@ resources:
 # -- Route traffic via standard Ingress (set enabled: true)
 ingress:
   enabled: false
-  className: nginx
+  className: traefik
   host: gonenote.example.com
   tlsSecretName: ""
 
