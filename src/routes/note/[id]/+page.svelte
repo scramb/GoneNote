@@ -1,42 +1,31 @@
 <script lang="ts">
   import type { PageData } from './$types';
+  import Container from '$components/Container.svelte';
+  import Card from '$components/Card.svelte';
+  import StatusAlert from '$components/StatusAlert.svelte';
+  import Button from '$components/Button.svelte';
 
-  export let data: PageData;
+  let { data } = $props<{ data: PageData }>();
 </script>
 
 <svelte:head>
-  <title>Bauhaus Note — View note</title>
+  <title>GoneNote — View note</title>
 </svelte:head>
 
-<main>
-  <pre class="note-content">{data.content}</pre>
-  <p class="notice">This note has been destroyed. It cannot be viewed again.</p>
-  <a href="/">Create your own note</a>
-</main>
+<main class="min-h-screen flex items-center justify-center px-4 py-16">
+  <Container maxWidth="md">
+    <Card padding="lg">
+      <pre class="text-[--text-base] font-[family-name:var(--font-mono)] whitespace-pre-wrap break-words m-0 leading-relaxed">{data.content}</pre>
+    </Card>
 
-<style>
-  main {
-    max-width: 720px;
-    margin: 2rem auto;
-    padding: 1rem;
-    font-family: system-ui, sans-serif;
-  }
-  .note-content {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 1rem;
-    font: inherit;
-    line-height: 1.5;
-  }
-  .notice {
-    color: #666;
-    font-size: 0.9rem;
-    margin: 1rem 0 0.5rem;
-  }
-  a {
-    color: #222;
-  }
-</style>
+    <div class="mt-8 animate-[fadeIn_400ms_ease-[--ease-entrance]_both]">
+      <StatusAlert
+        type="success"
+        title="Note destroyed"
+        message="This note has been permanently deleted and cannot be viewed again."
+        actionLabel="Create your own note"
+        actionHref="/"
+      />
+    </div>
+  </Container>
+</main>
