@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository_owner }}/gonenote
 
 jobs:
   docker:
@@ -70,4 +70,4 @@ jobs:
       - name: Push Helm chart
         run: |
           helm package charts/gonenote
-          helm push gonenote-*.tgz oci://${{ env.REGISTRY }}/${{ github.repository }}/charts
+          helm push gonenote-*.tgz oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/charts
