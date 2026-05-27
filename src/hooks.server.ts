@@ -24,10 +24,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const response = await resolve(event);
 
-  const imgSrc = branding.logoUrl ? ` img-src 'self' ${new URL(branding.logoUrl).origin}` : '';
+  const imgOrigin = branding.logoUrl ? ` ${new URL(branding.logoUrl).origin}` : '';
   response.headers.set(
     'Content-Security-Policy',
-    `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'${imgSrc}`,
+    `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self'${imgOrigin}; object-src 'none'; base-uri 'self'; form-action 'self'`,
   );
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'no-referrer');

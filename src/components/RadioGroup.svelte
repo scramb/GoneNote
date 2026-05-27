@@ -3,20 +3,20 @@
 
   let {
     name,
-    value = '',
+    value = $bindable(''),
     options,
     class: className = '',
     onchange,
   } = $props<{
     name: string;
-    value: string | undefined;
+    value?: string;
     options: Array<{ value: string; label: string }>;
     class?: string;
     onchange?: (value: string) => void;
   }>();
 </script>
 
-<fieldset data-testid="ttl-selector" class={cn('flex flex-wrap gap-2', className)}>
+<fieldset data-testid="ttl-selector" class={cn('flex flex-wrap gap-2 justify-center', className)}>
   {#each options as opt}
     <label
       class={cn(
@@ -31,7 +31,7 @@
         {name}
         value={opt.value}
         checked={value === opt.value}
-        onchange={() => onchange?.(opt.value)}
+        onchange={() => { value = opt.value; onchange?.(opt.value); }}
         class="sr-only"
       />
       {opt.label}
