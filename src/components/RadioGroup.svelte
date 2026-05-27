@@ -16,7 +16,7 @@
   }>();
 </script>
 
-<fieldset class={cn('flex flex-wrap gap-2', className)}>
+<fieldset data-testid="ttl-selector" class={cn('flex flex-wrap gap-2', className)}>
   {#each options as opt}
     <label
       class={cn(

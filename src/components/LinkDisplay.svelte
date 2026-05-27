@@ -32,7 +32,7 @@
       Share this link — it will work exactly once.
     </p>
     <div class="w-full flex gap-2">
-      <input
+      <input data-testid="note-link"
         type="text"
         value={absoluteUrl()}
         readonly

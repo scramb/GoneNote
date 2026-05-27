@@ -8,3 +8,8 @@ build/
 *.log
 .DS_Store
 Thumbs.db
+e2e/test-results/
+e2e/playwright-report/
+test-results/
+playwright-report/
+test-results.json

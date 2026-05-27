@@ -11,7 +11,9 @@
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
     "lint": "eslint src/ tests/",
-    "check": "svelte-kit sync && tsc --noEmit"
+    "check": "svelte-kit sync && tsc --noEmit",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -20,6 +22,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@sveltejs/adapter-node": "^5.2.0",
     "@sveltejs/kit": "^2.7.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",

@@ -15,7 +15,7 @@
 <main class="min-h-screen flex items-center justify-center px-4 py-16">
   <Container maxWidth="md">
     <Card padding="lg">
-      <pre class="text-[--text-base] font-[family-name:var(--font-mono)] whitespace-pre-wrap break-words m-0 leading-relaxed">{data.content}</pre>
+      <pre data-testid="note-content" class="text-[--text-base] font-[family-name:var(--font-mono)] whitespace-pre-wrap break-words m-0 leading-relaxed">{data.content}</pre>
     </Card>
 
     <div class="mt-8 animate-[fadeIn_400ms_ease-[--ease-entrance]_both]">

@@ -26,6 +26,7 @@
 
 <div class={cn('w-full', className)}>
   <textarea
+    data-testid="note-content"
     {name}
     value={value || ''}
     {maxlength}
@@ -43,7 +44,7 @@
   ></textarea>
   <div class="flex justify-between items-center mt-1">
     {#if error}
-      <p class="text-xs text-error m-0">{error}</p>
+      <p data-testid="validation-error" class="text-xs text-error m-0">{error}</p>
     {:else}
       <span></span>
     {/if}
