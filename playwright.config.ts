@@ -43,7 +43,7 @@ export default defineConfig({
     command: 'npm run build && node build',
     port: 3000,
     timeout: 30_000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     env: {
       SECRET_KEY: process.env.SECRET_KEY || 'e2e000000000000000000000000000000000000000000000000000000000000',
       REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
