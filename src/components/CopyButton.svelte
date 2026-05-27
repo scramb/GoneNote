@@ -25,6 +25,7 @@
 </script>
 
 <button
+  data-testid="copy-button"
   type="button"
   onclick={copy}
   class={cn(

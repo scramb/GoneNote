@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { class: className = '' } = $props<{ class?: string }>();
+  let { class: className = '', ...rest } = $props<{ class?: string; [key: string]: unknown }>();
 </script>
 
 <svg
@@ -14,6 +14,7 @@
   stroke-linejoin="round"
   class={className}
   aria-hidden="true"
+  {...rest}
 >
   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
   <path d="M7 11V7a5 5 0 0 1 10 0v4" />

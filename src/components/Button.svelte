@@ -40,6 +40,7 @@
 </script>
 
 <button
+  data-testid="submit-note"
   {type}
   {disabled}
   class={cn(base, variants[variant], sizes[size], loading && 'cursor-wait', className)}

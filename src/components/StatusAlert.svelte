@@ -33,14 +33,17 @@
   };
 </script>
 
-<div class={cn(
-  'flex flex-col items-center gap-3 p-8 rounded-[--radius-lg] border text-center',
-  bgColors[type],
-  className,
-)}>
+<div
+  data-testid={type === 'success' ? 'note-destroyed' : 'error-state'}
+  class={cn(
+    'flex flex-col items-center gap-3 p-8 rounded-[--radius-lg] border text-center',
+    bgColors[type],
+    className,
+  )}
+>
   <div class="w-12 h-12 rounded-full bg-elevated flex items-center justify-center">
     {#if type === 'success'}
-      <LockIcon class={cn('w-5 h-5', iconColors[type])} />
+      <LockIcon data-testid="lock-icon" class={cn('w-5 h-5', iconColors[type])} />
     {:else}
       <AlertIcon class={cn('w-5 h-5', iconColors[type])} />
     {/if}
