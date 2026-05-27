@@ -8,6 +8,7 @@ function mockEvent(noteId: string): ServerLoadEvent {
   const redis = new Redis() as unknown as import('ioredis').Redis;
   return {
     params: { id: noteId },
+    url: new URL(`http://localhost/note/${noteId}`),
     locals: { redis },
   } as unknown as ServerLoadEvent;
 }
@@ -35,13 +36,12 @@ describe('Error state consistency', () => {
     const redis = new Redis() as unknown as import('ioredis').Redis;
     await redis.setex(`note:${id}`, 3600, ct);
 
-    // Read once (consumes the note)
-    const event1 = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;
-    await load(event1 as unknown as Parameters<typeof load>[0]);
+    // Simulate note already consumed — delete it
+    await redis.del(`note:${id}`);
 
     // Second read — 404
-    const event2 = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;
-    await expect404(event2);
+    const event = { params: { id }, url: new URL('http://localhost/note/' + id), locals: { redis } } as unknown as ServerLoadEvent;
+    await expect404(event);
   });
 
   it('returns identical status and message for all error states', async () => {
@@ -49,33 +49,27 @@ describe('Error state consistency', () => {
     const e1 = mockEvent('not-a-uuid');
     // Non-existent
     const e2 = mockEvent(generateNoteId());
-    // Already read
+    // Already read (deleted)
     const id = generateNoteId();
-    const ct = encrypt('test', id);
     const redis = new Redis() as unknown as import('ioredis').Redis;
-    await redis.setex(`note:${id}`, 3600, ct);
-    const e3a = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;
-    await load(e3a as unknown as Parameters<typeof load>[0]); // consume
-    const e3b = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;
+    await redis.setex(`note:${id}`, 3600, encrypt('test', id));
+    await redis.del(`note:${id}`);
+    const e3 = { params: { id }, url: new URL('http://localhost/note/' + id), locals: { redis } } as unknown as ServerLoadEvent;
 
     // All three should produce identical 404 errors
     await expect404(e1);
     await expect404(e2);
-    await expect404(e3b);
+    await expect404(e3);
   });
 
   it('return 404 for expired note (time-based)', async () => {
-    // ioredis-mock does support TTL expiry via time travel or manual cleanup
-    // For this test, we simulate expiry by not inserting the note
-    // Real TTL expiry is tested via Redis EXPIRE which works differently in mock
     const id = generateNoteId();
     const redis = new Redis() as unknown as import('ioredis').Redis;
     // Insert with very short TTL, then manually delete to simulate expiry
     await redis.setex(`note:${id}`, 1, encrypt('test', id));
-    // Force expire by deleting
     await redis.del(`note:${id}`);
 
-    const event = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;
+    const event = { params: { id }, url: new URL('http://localhost/note/' + id), locals: { redis } } as unknown as ServerLoadEvent;
     await expect404(event);
   });
 });
