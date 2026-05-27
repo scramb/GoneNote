@@ -7,14 +7,10 @@
   import Button from '$components/Button.svelte';
   import ShieldIcon from '$components/icons/ShieldIcon.svelte';
   import LinkDisplay from '$components/LinkDisplay.svelte';
-  import StyleCustomizer from '$components/StyleCustomizer.svelte';
 
   let { form } = $props<{ form: ActionData }>();
   let content = $state('');
   let ttl = $state('604800');
-  let bgColor = $state<string | null>(null);
-  let primaryColor = $state<string | null>(null);
-  let secondaryColor = $state<string | null>(null);
 
   const maxLength = 102400;
   const ttls = [
@@ -66,23 +62,6 @@
             options={ttls}
           />
         </div>
-
-        <div class="mt-5">
-          <StyleCustomizer
-            backgroundColor={bgColor}
-            primaryColor={primaryColor}
-            secondaryColor={secondaryColor}
-            onchange={(colors) => {
-              bgColor = colors.backgroundColor;
-              primaryColor = colors.primaryColor;
-              secondaryColor = colors.secondaryColor;
-            }}
-          />
-        </div>
-
-        <input type="hidden" name="bgColor" value={bgColor ?? ''} />
-        <input type="hidden" name="primaryColor" value={primaryColor ?? ''} />
-        <input type="hidden" name="secondaryColor" value={secondaryColor ?? ''} />
 
         <div class="mt-6">
           <Button type="submit" variant="primary" size="md" class="w-full">
