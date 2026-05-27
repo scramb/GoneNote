@@ -12,19 +12,19 @@
   }>();
 
   let imgFailed = $state(false);
-  const showFallback = $derived(!logoUrl || imgFailed);
 </script>
 
-{#if showFallback}
-  <span data-testid="brand-name" class={cn('text-accent font-semibold tracking-tight text-lg', className)}>
+<span class={cn('inline-flex items-center gap-3', className)}>
+  {#if logoUrl && !imgFailed}
+    <img
+      data-testid="brand-logo"
+      src={logoUrl}
+      alt=""
+      onerror={() => (imgFailed = true)}
+      class="h-8 w-auto"
+    />
+  {/if}
+  <span data-testid="brand-name" class="text-accent font-semibold tracking-tight text-lg">
     {appName}
   </span>
-{:else}
-  <img
-    data-testid="brand-logo"
-    src={logoUrl!}
-    alt={appName}
-    onerror={() => (imgFailed = true)}
-    class={cn('h-8 w-auto', className)}
-  />
-{/if}
+</span>

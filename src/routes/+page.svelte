@@ -1,16 +1,21 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import type { ActionData } from './$types';
+  import type { LayoutData } from './$types';
   import Container from '$components/Container.svelte';
   import Textarea from '$components/Textarea.svelte';
   import RadioGroup from '$components/RadioGroup.svelte';
   import Button from '$components/Button.svelte';
+  import BrandLogo from '$components/BrandLogo.svelte';
   import ShieldIcon from '$components/icons/ShieldIcon.svelte';
   import LinkDisplay from '$components/LinkDisplay.svelte';
 
-  let { form } = $props<{ form: ActionData }>();
+  let { data, form } = $props<{ data: LayoutData; form: ActionData }>();
   let content = $state('');
   let ttl = $state('604800');
+
+  const appName = $derived(data.branding.appName);
+  const isBranded = $derived(appName !== 'GoneNote');
 
   const maxLength = 102400;
   const ttls = [
@@ -22,19 +27,25 @@
 </script>
 
 <svelte:head>
-  <title>GoneNote — Self-destructing notes</title>
+  <title>{appName} — Self-destructing notes</title>
 </svelte:head>
 
 <main class="min-h-screen flex flex-col items-center justify-center px-4 py-16">
   <Container maxWidth="md">
     <!-- Hero -->
     <div class="mb-10 animate-[fadeIn_400ms_ease-[--ease-entrance]_both]">
-      <div class="flex items-center justify-center gap-3 mb-4">
-        <ShieldIcon class="w-8 h-8 text-accent" />
-        <h1 class="text-3xl font-semibold tracking-tight text-primary m-0">
-          GoneNote
-        </h1>
-      </div>
+      {#if isBranded}
+        <div class="flex items-center justify-center mb-4">
+          <BrandLogo appName={data.branding.appName} logoUrl={data.branding.logoUrl} class="text-3xl" />
+        </div>
+      {:else}
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <ShieldIcon class="w-8 h-8 text-accent" />
+          <h1 class="text-3xl font-semibold tracking-tight text-primary m-0">
+            GoneNote
+          </h1>
+        </div>
+      {/if}
       <p class="text-lg text-secondary m-0 max-w-md mx-auto">
         Create a note that disappears forever after it's read.
       </p>
