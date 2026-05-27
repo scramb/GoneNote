@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createNoteSchema, noteIdSchema, TTL_VALUES } from '../../src/lib/validation';
+import { createNoteSchema, noteIdSchema, styleTemplateSchema, TTL_VALUES } from '../../src/lib/validation';
 
 describe('createNoteSchema', () => {
   it('accepts valid input with explicit TTL', () => {
@@ -77,6 +77,80 @@ describe('noteIdSchema', () => {
 
   it('rejects strings with extra characters', () => {
     const result = noteIdSchema.safeParse('550e8400-e29b-41d4-a716-446655440000-extra');
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('styleTemplateSchema', () => {
+  it('accepts valid hex colors', () => {
+    const result = styleTemplateSchema.safeParse({
+      backgroundColor: '#ff0000',
+      primaryColor: '#00ff00',
+      secondaryColor: '#0000ff',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts null for all fields', () => {
+    const result = styleTemplateSchema.safeParse({
+      backgroundColor: null,
+      primaryColor: null,
+      secondaryColor: null,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts partial templates (some fields null)', () => {
+    const result = styleTemplateSchema.safeParse({
+      backgroundColor: '#1a1a2e',
+      primaryColor: null,
+      secondaryColor: null,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts null (no customization)', () => {
+    const result = styleTemplateSchema.safeParse(null);
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts undefined/missing fields', () => {
+    const result = styleTemplateSchema.safeParse({});
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects invalid hex (non-hex chars)', () => {
+    const result = styleTemplateSchema.safeParse({
+      backgroundColor: '#GGGGGG',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects CSS injection attempts', () => {
+    const result = styleTemplateSchema.safeParse({
+      backgroundColor: 'red; background-image: url(http://evil.com)',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects hex without # prefix', () => {
+    const result = styleTemplateSchema.safeParse({
+      primaryColor: 'ff0000',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects 3-digit hex shorthand', () => {
+    const result = styleTemplateSchema.safeParse({
+      primaryColor: '#f00',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects empty string', () => {
+    const result = styleTemplateSchema.safeParse({
+      backgroundColor: '',
+    });
     expect(result.success).toBe(false);
   });
 });

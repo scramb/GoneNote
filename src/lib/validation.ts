@@ -22,3 +22,18 @@ export const UUID_V4_REGEX =
 export const noteIdSchema = z.string().regex(UUID_V4_REGEX, 'Invalid note identifier format.');
 
 export type CreateNoteInput = z.infer<typeof createNoteSchema>;
+
+// Hex color validation
+const HEX_COLOR_REGEX = /^#[0-9a-fA-F]{6}$/;
+const hexColor = z.string().regex(HEX_COLOR_REGEX, 'Invalid hex color format. Use #RRGGBB.').nullable();
+
+export const styleTemplateSchema = z
+  .object({
+    backgroundColor: hexColor,
+    primaryColor: hexColor,
+    secondaryColor: hexColor,
+  })
+  .partial()
+  .nullable();
+
+export type StyleTemplate = z.infer<typeof styleTemplateSchema>;

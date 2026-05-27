@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit';
-import { createNoteSchema } from '$lib/validation';
+import { createNoteSchema, styleTemplateSchema } from '$lib/validation';
 import { generateNoteId, encrypt } from '$lib/crypto';
 import { log } from '$lib/logger';
 import type { Actions } from './$types';
@@ -22,12 +22,31 @@ export const actions: Actions = {
       return fail(400, { success: false, error: issue?.message || 'Validation failed.' });
     }
 
+    // Parse and validate style template (optional)
+    const bgColorRaw = formData.get('bgColor');
+    const primaryColorRaw = formData.get('primaryColor');
+    const secondaryColorRaw = formData.get('secondaryColor');
+
+    const styleParsed = styleTemplateSchema.safeParse({
+      backgroundColor: typeof bgColorRaw === 'string' && bgColorRaw !== '' ? bgColorRaw : null,
+      primaryColor: typeof primaryColorRaw === 'string' && primaryColorRaw !== '' ? primaryColorRaw : null,
+      secondaryColor: typeof secondaryColorRaw === 'string' && secondaryColorRaw !== '' ? secondaryColorRaw : null,
+    });
+
+    if (!styleParsed.success) {
+      log({ op: 'note.create', outcome: 'failure', duration: Date.now() - start });
+      return fail(400, { success: false, error: 'Invalid color format. Use hex colors like #FF5733.' });
+    }
+
+    const style = styleParsed.data;
+
     const { content: validatedContent, ttl: validatedTtl } = parsed.data;
 
     try {
       const noteId = generateNoteId();
       const ciphertext = encrypt(validatedContent, noteId);
-      await locals.redis.setex(`note:${noteId}`, Number(validatedTtl), ciphertext);
+      const noteData = JSON.stringify({ content: ciphertext, style });
+      await locals.redis.setex(`note:${noteId}`, Number(validatedTtl), noteData);
       log({ op: 'note.create', outcome: 'success', ttl: Number(validatedTtl), duration: Date.now() - start });
       return { success: true, noteUrl: `/note/${noteId}` };
     } catch (err) {
