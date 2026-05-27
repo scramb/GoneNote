@@ -39,7 +39,8 @@ test.describe('TTL Selection', () => {
     const url = await home.getNoteUrl();
 
     await page.goto(url);
-    await expect(notePage.noteContent).toBeVisible();
+    await notePage.reveal();
+    await expect(notePage.noteContent).toBeVisible({ timeout: 10000 });
     await expect(notePage.destroyedState).toBeVisible();
   });
 });

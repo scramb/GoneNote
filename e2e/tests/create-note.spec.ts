@@ -17,7 +17,7 @@ test.describe('Note Creation', () => {
     await expect(home.validationError).not.toBeVisible();
   });
 
-  test('TC-002: click the generated link to view the note', async ({ page }) => {
+  test('TC-002: click the generated link and reveal the note', async ({ page }) => {
     const home = new HomePage(page);
 
     await home.goto();
@@ -29,6 +29,9 @@ test.describe('Note Creation', () => {
     const url = await home.getNoteUrl();
 
     await page.goto(url);
-    await expect(page.locator('[data-testid="note-content"]')).toBeVisible();
+    // Click reveal to actually read the note
+    await page.getByRole('button', { name: 'Reveal Note' }).click();
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('[data-testid="note-content"]')).toBeVisible({ timeout: 10000 });
   });
 });

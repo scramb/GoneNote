@@ -4,7 +4,7 @@ import { decrypt } from '$lib/crypto';
 import { log } from '$lib/logger';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
   const start = Date.now();
   const idResult = noteIdSchema.safeParse(params.id);
 
@@ -14,18 +14,36 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   }
 
   const noteId = idResult.data;
+  const shouldReveal = url.searchParams.has('reveal');
 
+  if (!shouldReveal) {
+    // Check existence only — don't read the note
+    try {
+      const exists = await locals.redis.exists(`note:${noteId}`);
+
+      if (!exists) {
+        log({ op: 'note.read', outcome: 'failure', duration: Date.now() - start });
+        throw error(404, 'Note not found.');
+      }
+
+      log({ op: 'note.check', outcome: 'success', duration: Date.now() - start });
+      return { noteExists: true as const };
+    } catch (err) {
+      if ((err as { status?: number }).status === 404) throw err;
+      log({ op: 'note.read', outcome: 'failure', duration: Date.now() - start });
+      throw error(500, 'Unable to access note.');
+    }
+  }
+
+  // Reveal: read and destroy the note
   try {
     const raw = await locals.redis.getdel(`note:${noteId}`);
 
     if (raw === null) {
-      log({ op: 'note.read', outcome: 'failure', duration: Date.now() - start });
-      throw error(404, 'Note not found.');
+      log({ op: 'note.reveal', outcome: 'failure', duration: Date.now() - start });
+      throw error(404, 'Note no longer available.');
     }
 
-    // Parse JSON wrapper for backward compatibility with notes created during
-    // the custom-style-templates feature period (005). Old format: {"content":"...","style":{...}}
-    // New format: plain ciphertext string. Discard per-note style data.
     let ciphertext: string;
     try {
       const parsed = JSON.parse(raw);
@@ -35,12 +53,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     }
 
     const plaintext = decrypt(ciphertext, noteId);
-    log({ op: 'note.read', outcome: 'success', duration: Date.now() - start });
-    return { content: plaintext };
+    log({ op: 'note.reveal', outcome: 'success', duration: Date.now() - start });
+    return { revealed: true as const, content: plaintext };
   } catch (err) {
     if ((err as { status?: number }).status === 404) throw err;
-    log({ op: 'note.read', outcome: 'failure', duration: Date.now() - start });
-    console.error('Error reading note:', err instanceof Error ? err.message : String(err));
-    throw error(500, 'Unable to read note. Please try again later.');
+    log({ op: 'note.reveal', outcome: 'failure', duration: Date.now() - start });
+    throw error(500, 'Unable to read note.');
   }
 };

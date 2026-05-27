@@ -1,67 +1,63 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import Redis from 'ioredis-mock';
 import { load } from '../../src/routes/note/[id]/+page.server';
 import { encrypt, generateNoteId } from '../../src/lib/crypto';
 import type { ServerLoadEvent } from '@sveltejs/kit';
 
-function mockEvent(noteId: string): ServerLoadEvent {
+function mockLoadEvent(noteId: string, reveal = false): ServerLoadEvent {
   const redis = new Redis() as unknown as import('ioredis').Redis;
+  const url = new URL(`http://localhost/note/${noteId}`);
+  if (reveal) url.searchParams.set('reveal', '1');
   return {
     params: { id: noteId },
+    url,
     locals: { redis },
   } as unknown as ServerLoadEvent;
 }
 
-describe('GET /note/[id] (view note)', () => {
-  const noteId = generateNoteId();
-  const plaintext = 'This is a secret note.';
-
-  beforeEach(async () => {
-    // Each test gets a fresh Redis and fresh note
-  });
-
-  it('retrieves and decrypts a note, returning the plaintext', async () => {
-    const ct = encrypt(plaintext, noteId);
-    const event = mockEvent(noteId);
+describe('GET /note/[id] (existence check)', () => {
+  it('returns noteExists without consuming the note', async () => {
+    const noteId = generateNoteId();
+    const ct = encrypt('This is a secret note.', noteId);
+    const event = mockLoadEvent(noteId);
     await event.locals.redis.setex(`note:${noteId}`, 3600, ct);
 
     const result = await load(event as unknown as Parameters<typeof load>[0]);
-    expect(result).toEqual({ content: plaintext });
+    expect(result).toEqual({ noteExists: true });
+
+    // Note still exists
+    const stillExists = await event.locals.redis.exists(`note:${noteId}`);
+    expect(stillExists).toBe(1);
   });
 
-  it('returns 404 when note has already been read (GETDEL returns nil)', async () => {
-    const event = mockEvent(noteId);
-    // Note was not inserted, so GETDEL returns nil
-
+  it('throws 404 when note never existed', async () => {
+    const event = mockLoadEvent(generateNoteId());
     await expect(
       load(event as unknown as Parameters<typeof load>[0]),
-    ).rejects.toMatchObject({ status: 404, body: { message: 'Note not found.' } });
-  });
-
-  it('returns 404 when note never existed', async () => {
-    const nonexistentId = generateNoteId();
-    const event = mockEvent(nonexistentId);
-
-    await expect(
-      load(event as unknown as Parameters<typeof load>[0]),
-    ).rejects.toMatchObject({ status: 404, body: { message: 'Note not found.' } });
-  });
-
-  it('destroys the note on read (second GETDEL returns nil)', async () => {
-    const id = generateNoteId();
-    const ct = encrypt(plaintext, id);
-    const redis = new Redis() as unknown as import('ioredis').Redis;
-    await redis.setex(`note:${id}`, 3600, ct);
-
-    // First read
-    const event1 = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;
-    const result1 = await load(event1 as unknown as Parameters<typeof load>[0]);
-    expect(result1).toEqual({ content: plaintext });
-
-    // Second read — should 404
-    const event2 = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;
-    await expect(
-      load(event2 as unknown as Parameters<typeof load>[0]),
     ).rejects.toMatchObject({ status: 404 });
+  });
+});
+
+describe('GET /note/[id]?reveal=1 (reveal and destroy)', () => {
+  it('reveals and destroys the note', async () => {
+    const noteId = generateNoteId();
+    const plaintext = 'This is a secret note.';
+    const ct = encrypt(plaintext, noteId);
+    const event = mockLoadEvent(noteId, true);
+    await event.locals.redis.setex(`note:${noteId}`, 3600, ct);
+
+    const result = await load(event as unknown as Parameters<typeof load>[0]);
+    expect(result).toEqual({ revealed: true, content: plaintext });
+
+    // Note is gone
+    const exists = await event.locals.redis.exists(`note:${noteId}`);
+    expect(exists).toBe(0);
+  });
+
+  it('throws 404 when note already consumed', async () => {
+    const event = mockLoadEvent(generateNoteId(), true);
+    await expect(
+      load(event as unknown as Parameters<typeof load>[0]),
+    ).rejects.toMatchObject({ status: 404, body: { message: 'Note no longer available.' } });
   });
 });
