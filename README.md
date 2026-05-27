@@ -6,10 +6,11 @@ Self-destructing notes. Create a note, share the link — it's gone after the fi
 
 - **One-time read** — notes are atomically destroyed on first access via Redis `GETDEL`
 - **TTL expiry** — unread notes auto-expire (1 hour, 1 day, 7 days, 30 days)
+- **Custom style templates** — optionally customize background, primary, and secondary colors per note
 - **Zero retention** — no backups, no replication, no logs containing note content
 - **AES-256-GCM encryption** — notes encrypted at rest with per-note keys
 - **No accounts** — no authentication, no sessions, no history, no tracking
-- **Minimal** — dark theme, system fonts, fast loads
+- **Minimal** — dark-first design system, system fonts, fast loads
 
 ## Quickstart
 
@@ -48,10 +49,11 @@ npm run dev
 ## Usage
 
 1. Open the app — you'll see a text area and TTL selector
-2. Type your note, pick an expiry, click **Create Note**
-3. Copy the link and share it with the recipient
-4. The recipient opens the link — the note is displayed once and permanently destroyed
-5. Any subsequent access shows "Note not found"
+2. Type your note, pick an expiry, optionally expand **Customize Style** to pick custom colors
+3. Click **Create Note**
+4. Copy the link and share it with the recipient
+5. The recipient opens the link — the note is displayed once in your chosen colors and permanently destroyed
+6. Any subsequent access shows "Note not found"
 
 ## Tech stack
 
@@ -61,16 +63,26 @@ npm run dev
 | Storage | Redis 7 (ephemeral, no persistence) |
 | Validation | Zod |
 | Styling | Tailwind CSS 4 (dark-first design system) |
-| Testing | Vitest (38 tests, unit + integration) |
+| Testing | Vitest (48 unit + integration tests), Playwright (45 e2e tests across Chromium, Firefox, WebKit) |
 | Deployment | Docker, Helm, GitHub Actions |
+
+## Testing
+
+```bash
+# Unit and integration tests
+npm test
+
+# End-to-end tests (requires Redis)
+npx playwright test --project=chromium
+```
 
 ## Documentation
 
 - [Contributing](CONTRIBUTING.md)
 - [Constitution](.specify/memory/constitution.md)
-- [Quickstart](specs/001-ephemeral-notes/quickstart.md)
+- [E2e test suite](specs/004-e2e-test-suite/quickstart.md)
+- [Custom style templates](specs/005-custom-style-templates/quickstart.md)
 - [Design tokens](specs/002-gonenote-redesign/design-tokens.md)
-- [API contracts](specs/001-ephemeral-notes/contracts/routes.md)
 
 ## License
 
