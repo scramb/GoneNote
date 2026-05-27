@@ -10,6 +10,8 @@
     message,
     actionLabel = '',
     actionHref = '',
+    primaryColor = null,
+    secondaryColor = null,
     class: className = '',
   } = $props<{
     type: 'success' | 'info' | 'error';
@@ -17,6 +19,8 @@
     message: string;
     actionLabel?: string;
     actionHref?: string;
+    primaryColor?: string | null;
+    secondaryColor?: string | null;
     class?: string;
   }>();
 
@@ -48,10 +52,13 @@
       <AlertIcon class={cn('w-5 h-5', iconColors[type])} />
     {/if}
   </div>
-  <h2 class={cn('text-xl font-semibold m-0', type === 'error' ? 'text-error' : 'text-primary')}>
+  <h2
+    class={cn('text-xl font-semibold m-0', type === 'error' && !primaryColor ? 'text-error' : 'text-primary')}
+    style={primaryColor ? `color: ${primaryColor}` : undefined}
+  >
     {title}
   </h2>
-  <p class="text-sm text-secondary m-0 max-w-sm">{message}</p>
+  <p class="text-sm m-0 max-w-sm" style={secondaryColor ? `color: ${secondaryColor}` : 'color: var(--color-secondary)'}>{message}</p>
   {#if actionLabel && actionHref}
     <a href={actionHref} class="mt-2">
       <Button variant="ghost" size="sm">{actionLabel}</Button>
