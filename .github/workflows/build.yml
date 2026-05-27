@@ -151,5 +151,7 @@ jobs:
 
       - name: Push Helm chart
         run: |
+          sed -i "s/^version: .*/version: ${{ github.ref_name }}/" charts/gonenote/Chart.yaml
+          sed -i "s/^appVersion: .*/appVersion: \"${{ github.ref_name }}\"/" charts/gonenote/Chart.yaml
           helm package charts/gonenote
           helm push gonenote-*.tgz oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/charts
