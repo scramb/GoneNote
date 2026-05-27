@@ -26,7 +26,7 @@ describe('GET /note/[id] (view note)', () => {
     await event.locals.redis.setex(`note:${noteId}`, 3600, ct);
 
     const result = await load(event as unknown as Parameters<typeof load>[0]);
-    expect(result).toEqual({ content: plaintext, style: null });
+    expect(result).toEqual({ content: plaintext });
   });
 
   it('returns 404 when note has already been read (GETDEL returns nil)', async () => {
@@ -56,7 +56,7 @@ describe('GET /note/[id] (view note)', () => {
     // First read
     const event1 = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;
     const result1 = await load(event1 as unknown as Parameters<typeof load>[0]);
-    expect(result1).toEqual({ content: plaintext, style: null });
+    expect(result1).toEqual({ content: plaintext });
 
     // Second read — should 404
     const event2 = { params: { id }, locals: { redis } } as unknown as ServerLoadEvent;

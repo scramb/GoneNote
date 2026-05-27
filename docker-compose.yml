@@ -19,6 +19,10 @@ services:
       REDIS_URL: redis://redis:6379
       MAX_NOTE_LENGTH: ${MAX_NOTE_LENGTH:-102400}
       DEFAULT_TTL: ${DEFAULT_TTL:-604800}
+      # Whitelabel branding (all optional)
+      APP_NAME: ${APP_NAME:-GoneNote}
+      # APP_LOGO_URL:
+      # APP_COLOR_ROOT: "#0a0a0f"
     depends_on:
       redis:
         condition: service_healthy

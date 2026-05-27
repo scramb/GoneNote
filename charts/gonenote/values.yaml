@@ -14,6 +14,23 @@ app:
   maxNoteLength: "102400"
   defaultTtl: "604800"
 
+# Whitelabel branding (all optional — unset = GoneNote defaults)
+branding:
+  name: ""
+  logoUrl: ""
+  colors:
+    root: ""
+    surface: ""
+    elevated: ""
+    border: ""
+    primary: ""
+    secondary: ""
+    muted: ""
+    accent: ""
+    accentHover: ""
+    success: ""
+    error: ""
+
 redis:
   image: redis:7-alpine
   port: 6379
