@@ -10,3 +10,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "gonenote.redis.fullname" -}}
 {{ include "gonenote.fullname" . }}-redis
 {{- end }}
+
+{{- define "gonenote.redis.labels" -}}
+app.kubernetes.io/name: {{ include "gonenote.redis.fullname" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: redis
+{{- end }}

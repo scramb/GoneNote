@@ -8,11 +8,16 @@ image:
 
 # -- Generate on first install and keep: openssl rand -hex 32
 secretKey: ""
+useExistingSecret: false
+existingSecret:
+  name: ""
 
 app:
   port: 3000
   maxNoteLength: "102400"
   defaultTtl: "604800"
+  # -- Optional: protect the API endpoint with a Bearer token
+  apiKey: ""
 
 # Whitelabel branding (all optional — unset = GoneNote defaults)
 branding:

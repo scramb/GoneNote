@@ -7,3 +7,45 @@ data:
   REDIS_URL: redis://{{ include "gonenote.redis.fullname" . }}:{{ .Values.redis.port | toString }}
   MAX_NOTE_LENGTH: {{ .Values.app.maxNoteLength | quote }}
   DEFAULT_TTL: {{ .Values.app.defaultTtl | quote }}
+  {{- if .Values.branding.name }}
+  APP_NAME: {{ .Values.branding.name | quote }}
+  {{- end }}
+  {{- if .Values.branding.logoUrl }}
+  APP_LOGO_URL: {{ .Values.branding.logoUrl | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.root }}
+  APP_COLOR_ROOT: {{ .Values.branding.colors.root | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.surface }}
+  APP_COLOR_SURFACE: {{ .Values.branding.colors.surface | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.elevated }}
+  APP_COLOR_ELEVATED: {{ .Values.branding.colors.elevated | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.border }}
+  APP_COLOR_BORDER: {{ .Values.branding.colors.border | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.primary }}
+  APP_COLOR_PRIMARY: {{ .Values.branding.colors.primary | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.secondary }}
+  APP_COLOR_SECONDARY: {{ .Values.branding.colors.secondary | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.muted }}
+  APP_COLOR_MUTED: {{ .Values.branding.colors.muted | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.accent }}
+  APP_COLOR_ACCENT: {{ .Values.branding.colors.accent | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.accentHover }}
+  APP_COLOR_ACCENT_HOVER: {{ .Values.branding.colors.accentHover | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.success }}
+  APP_COLOR_SUCCESS: {{ .Values.branding.colors.success | quote }}
+  {{- end }}
+  {{- if .Values.branding.colors.error }}
+  APP_COLOR_ERROR: {{ .Values.branding.colors.error | quote }}
+  {{- end }}
+  {{- if .Values.app.apiKey }}
+  API_KEY: {{ .Values.app.apiKey | quote }}
+  {{- end }}

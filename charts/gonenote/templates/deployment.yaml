@@ -34,7 +34,11 @@ spec:
             - configMapRef:
                 name: {{ include "gonenote.fullname" . }}
             - secretRef:
+                {{- if .Values.useExistingSecret }}
+                name: {{ .Values.existingSecret.name }}
+                {{- else }}
                 name: {{ include "gonenote.fullname" . }}
+                {{- end }}
           env:
             - name: HOST
               value: "0.0.0.0"
